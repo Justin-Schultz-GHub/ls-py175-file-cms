@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h2>File List:</h2>
+    <ul>
+        {% for file in files %}
+        <li>
+            <a href="{{ url_for('display_file', filename=file) }}">{{ file }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
