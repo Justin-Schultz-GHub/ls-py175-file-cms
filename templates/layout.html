@@ -2,9 +2,20 @@
 <html lang="en-US">
     <head>
         <title>File-Based Content Management System</title>
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=PT+Sans">
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/application.css') }}">
     </head>
     <body>
         <header>File-Based Content Management System</header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class='flash {{ category }}'>
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <main>
             {% block content %}
             <!-- Filled in by the `content` block from another template file -->

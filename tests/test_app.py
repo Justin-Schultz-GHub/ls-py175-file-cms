@@ -1,3 +1,4 @@
+import html
 import unittest
 from app import app
 
@@ -32,3 +33,15 @@ class AppTest(unittest.TestCase):
                 self.assertEqual(response.status_code, 200, msg=f"Failed on {file_name}")
                 response_text = response.get_data(as_text=True)
                 self.assertIn(expected_string, response_text, msg=f'Failed on file: {file_name}')
+
+    def test_file_not_found(self):
+        fake_file = 'fake.txt'
+        with self.client.get(f'/files/{fake_file}', follow_redirects=True) as response:
+            self.assertEqual(response.status_code, 200)
+            unescaped_response_text = html.unescape(response.get_data(as_text=True))
+            self.assertIn(f'"{fake_file}" does not exist.', unescaped_response_text)
+
+        with self.client.get(f'/') as response:
+            unescaped_response_text = html.unescape(response.get_data(as_text=True))
+            self.assertNotIn(f'"{fake_file}" does not exist.',
+                            unescaped_response_text)
