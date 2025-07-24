@@ -2,10 +2,10 @@
 
 {% block content %}
     <h2>File List:</h2>
-    <ul>
+    <ul id='files'>
         {% for file in files %}
         <li>
-            <a href="{{ url_for('display_file', filename=file) }}">{{ file }}</a>
+            <a href="{{ url_for('display_file', filename=file) }}">{{ file | capitalize }}</a>
         </li>
         {% endfor %}
     </ul>

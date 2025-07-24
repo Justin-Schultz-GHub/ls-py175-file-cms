@@ -20,3 +20,27 @@
   color: #33cc99;
   background: #CBF2E5;
 }
+
+#files li {
+  position: relative;
+  margin: 0 0 10px 0;
+  border-radius: 8px;
+  background: #f6f6f6;
+  list-style-type: none;
+  width: 50%;
+}
+
+#files li a {
+  color: #ffffff;
+  display: block;
+  padding: 18px clamp(10px, 5vw, 25px) 18px clamp(2px, 5vw, 57px);
+  text-decoration: none;
+  font-size: clamp(6px, 4vw, 80px);
+  font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  #files li {
+    width: 50%;
+  }
+}Add some styling to the list of files for clarity
