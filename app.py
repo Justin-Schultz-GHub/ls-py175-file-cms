@@ -1,3 +1,4 @@
+from markdown import markdown
 import os
 from flask import (
                     flash,
@@ -17,8 +18,11 @@ def get_data_dir():
     root = os.path.abspath(os.path.dirname(__file__))
     return os.path.join(root, 'cms', 'data')
 
-def is_valid_path(data_dir, filename):
-    return os.path.isfile(os.path.join(data_dir, filename))
+def get_file_path(data_dir, filename):
+    return os.path.join(data_dir, filename)
+
+def is_valid_path(file_path):
+    return os.path.isfile(file_path)
 
 # Route hooks
 @app.route('/')
@@ -35,8 +39,15 @@ def get_files():
 @app.route('/files/<filename>')
 def display_file(filename):
     data_dir = get_data_dir()
-    if is_valid_path(data_dir, filename):
-        return send_from_directory(data_dir, filename)
+    file_path = get_file_path(data_dir, filename)
+
+    if is_valid_path(file_path):
+        if filename.endswith('.md'):
+            with open(file_path, 'r') as file:
+                content = file.read()
+            return markdown(content)
+        else:
+            return send_from_directory(data_dir, filename)
 
     flash(f'"{filename}" does not exist.', 'error')
     return redirect(url_for('index'))
