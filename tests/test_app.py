@@ -17,13 +17,13 @@ class AppTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.get_data(as_text=True)
         self.assertIn('<h2>File List:</h2>', data)
-        self.assertIn('about.txt', data)
+        self.assertIn('about.md', data)
         self.assertIn('changes.txt', data)
         self.assertIn('history.txt', data)
 
     def test_display_file(self):
         test_cases = {
-            'about.txt': 'This is my app.',
+            'about.md': 'About This Project',
             'changes.txt': 'There are many changes.',
             'history.txt': '1989 - Guido van Rossum starts developing Python.'
         }
@@ -45,3 +45,10 @@ class AppTest(unittest.TestCase):
             unescaped_response_text = html.unescape(response.get_data(as_text=True))
             self.assertNotIn(f'"{fake_file}" does not exist.',
                             unescaped_response_text)
+
+    def test_markdown_display(self):
+        with self.client.get(f'/files/about.md') as response:
+            self.assertEqual(response.status_code, 200)
+            response_text = response.get_data(as_text=True)
+            self.assertIn(f'<h1>About This Project</h1>', response_text)
+            self.assertIn(f'<h2>Technologies</h2>', response_text)
