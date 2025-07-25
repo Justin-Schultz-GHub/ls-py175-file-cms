@@ -1,6 +1,6 @@
 import html
 import unittest
-from app import app
+from app import app, get_data_dir, get_file_path
 
 class AppTest(unittest.TestCase):
     def setUp(self):
@@ -16,7 +16,7 @@ class AppTest(unittest.TestCase):
         response = self.client.get('/files')
         self.assertEqual(response.status_code, 200)
         data = response.get_data(as_text=True)
-        self.assertIn('<h2>File List:</h2>', data)
+        self.assertIn('<h2 id=file-list-title>File List:</h2>', data)
         self.assertIn('about.md', data)
         self.assertIn('changes.txt', data)
         self.assertIn('history.txt', data)
@@ -52,3 +52,31 @@ class AppTest(unittest.TestCase):
             response_text = response.get_data(as_text=True)
             self.assertIn(f'<h1>About This Project</h1>', response_text)
             self.assertIn(f'<h2>Technologies</h2>', response_text)
+
+    def test_edit_file_page(self):
+        response = self.client.get('/files/changes.txt/edit')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("<textarea", response.get_data(as_text=True))
+        self.assertIn('<input type="submit" value="Save"/>', response.get_data(as_text=True))
+
+    def test_save_file(self):
+        test_files = ['changes.txt','about.md', 'history.txt']
+        data_dir = get_data_dir()
+
+        for filename in test_files:
+            file_path = get_file_path(data_dir, filename)
+            with open(file_path, 'r') as file:
+                original_content = file.read()
+
+            new_content = 'This is a test.'
+            response = self.client.post(
+                        f'/files/{filename}',
+                        data={'edit_file': new_content},
+                        content_type='application/x-www-form-urlencoded'
+                    )
+            self.assertEqual(response.status_code, 302)
+            with open(file_path, 'r') as file:
+                self.assertEqual(new_content, file.read())
+
+            with open(file_path, 'w') as file:
+                file.write(original_content)
