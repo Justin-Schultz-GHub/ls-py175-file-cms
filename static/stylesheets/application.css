@@ -1,3 +1,7 @@
+header {
+  font-size: 50px;
+}
+
 .flash {
   max-width: 960px;
   padding: 10px 20px;
@@ -21,26 +25,69 @@
   background: #CBF2E5;
 }
 
+#files {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 #files li {
   position: relative;
-  margin: 0 0 10px 0;
+  margin-bottom: 10px;
   border-radius: 8px;
   background: #f6f6f6;
-  list-style-type: none;
-  width: 50%;
+  list-style: none;
+  flex: 0 1 auto;
+  white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #files li a {
-  color: #ffffff;
+  color: #fff;
   display: block;
   padding: 18px clamp(10px, 5vw, 25px) 18px clamp(2px, 5vw, 57px);
   text-decoration: none;
-  font-size: clamp(6px, 4vw, 80px);
+  font-size: clamp(6px, 4vw, 40px);
   font-weight: bold;
+  width: max-content;
+  max-width: 100%;
+}
+
+#file-list-title {
+  font-size: 50px;
+}
+
+.edit::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  background: url('/static/images/icon_edit.png') no-repeat center center;
+  background-size: contain;
+  vertical-align: middle;
+}
+
+textarea[name="edit_file"] {
+  height: 300px;
+  font-family: monospace;
+  font-size: 16px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: both;
+  width: 75%;
 }
 
 @media (min-width: 768px) {
-  #files li {
+  textarea[name="edit_file"] {
     width: 50%;
   }
+}
+
+input[type="submit"] {
+  display: block;
+  margin-top: 10px;
 }

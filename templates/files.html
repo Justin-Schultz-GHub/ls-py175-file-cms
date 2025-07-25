@@ -1,11 +1,12 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <h2>File List:</h2>
+    <h2 id=file-list-title>File List:</h2>
     <ul id='files'>
         {% for file in files %}
         <li>
             <a href="{{ url_for('display_file', filename=file) }}">{{ file | capitalize }}</a>
+            <a class="edit" href="{{ url_for('edit_file', filename=file) }}">Edit Document</a>
         </li>
         {% endfor %}
     </ul>

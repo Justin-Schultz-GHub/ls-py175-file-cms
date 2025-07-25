@@ -52,5 +52,31 @@ def display_file(filename):
     flash(f'"{filename}" does not exist.', 'error')
     return redirect(url_for('index'))
 
+@app.route('/files/<filename>/edit')
+def edit_file(filename):
+    data_dir = get_data_dir()
+    file_path = get_file_path(data_dir, filename)
+
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    return render_template('edit_file.html', file=filename, content=content)
+
+@app.route('/files/<filename>', methods=['POST'])
+def save_file(filename):
+    data_dir = get_data_dir()
+    file_path = get_file_path(data_dir, filename)
+
+    if is_valid_path(file_path):
+        new_content = request.form['edit_file']
+        with open(file_path, 'w') as file:
+            file.write(new_content)
+
+        flash(f'Successfully edited {filename}.', 'success')
+        return redirect(url_for('index'))
+
+    flash(f'"{filename}" does not exist.', 'error')
+    return redirect(url_for('index'))
+
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
