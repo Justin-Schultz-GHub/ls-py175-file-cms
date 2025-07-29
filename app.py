@@ -15,8 +15,8 @@ app.secret_key='secret1'
 
 # Helper functions
 def get_data_dir():
-    root = os.path.abspath(os.path.dirname(__file__))
-    return os.path.join(root, 'cms', 'data')
+    subdir = 'tests/data' if app.config['TESTING'] else 'cms/data'
+    return os.path.join(os.path.dirname(__file__), subdir)
 
 def get_file_path(data_dir, filename):
     return os.path.join(data_dir, filename)
