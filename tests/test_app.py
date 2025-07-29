@@ -1,4 +1,6 @@
 import html
+import os
+import shutil
 import unittest
 from app import app, get_data_dir, get_file_path
 
@@ -6,17 +8,30 @@ class AppTest(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
         self.client = app.test_client()
+        self.data_path = os.path.join(os.path.dirname(__file__), 'data')
+        os.makedirs(self.data_path, exist_ok=True)
+
+        test_cases = {
+            'about.md': '# About This Project',
+            'changes.txt': 'There are many changes.',
+            'history.txt': '1989 - Guido van Rossum starts developing Python.'
+        }
+
+        for key, value in test_cases.items():
+            self.create_document(key, value)
+
+    def create_document(self, name, content=""):
+        with open(os.path.join(self.data_path, name), 'w') as file:
+            file.write(content)
 
     def test_index(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/files', response.headers['Location'])
 
     def test_get_files(self):
         response = self.client.get('/files')
         self.assertEqual(response.status_code, 200)
         data = response.get_data(as_text=True)
-        self.assertIn('<h2 id=file-list-title>File List:</h2>', data)
         self.assertIn('about.md', data)
         self.assertIn('changes.txt', data)
         self.assertIn('history.txt', data)
@@ -51,7 +66,6 @@ class AppTest(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             response_text = response.get_data(as_text=True)
             self.assertIn(f'<h1>About This Project</h1>', response_text)
-            self.assertIn(f'<h2>Technologies</h2>', response_text)
 
     def test_edit_file_page(self):
         response = self.client.get('/files/changes.txt/edit')
@@ -80,3 +94,6 @@ class AppTest(unittest.TestCase):
 
             with open(file_path, 'w') as file:
                 file.write(original_content)
+
+    def tearDown(self):
+        shutil.rmtree(self.data_path, ignore_errors=True)

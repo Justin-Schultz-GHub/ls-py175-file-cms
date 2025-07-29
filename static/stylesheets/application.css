@@ -34,7 +34,7 @@ header {
   position: relative;
   margin-bottom: 10px;
   border-radius: 8px;
-  background: #f6f6f6;
+  background: #e0e0e0;
   list-style: none;
   flex: 0 1 auto;
   white-space: nowrap;
@@ -44,7 +44,7 @@ header {
 }
 
 #files li a {
-  color: #fff;
+  color: #000;
   display: block;
   padding: 18px clamp(10px, 5vw, 25px) 18px clamp(2px, 5vw, 57px);
   text-decoration: none;
