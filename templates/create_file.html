@@ -11,6 +11,9 @@
         </select>
         <h3>New Document Content:</h3>
         <textarea name="file_content"></textarea>
-        <input type="submit" value="Submit"/>
+        <div>
+            <input type="submit" value="Submit"/>
+            <button type="button" class="cancel-button" onclick="window.location='{{ url_for('index') }}'">Cancel</button>
+        </div>
     </form>
 {% endblock %}

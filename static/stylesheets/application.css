@@ -112,7 +112,7 @@ textarea[name="file_content"] {
 }
 
 input[type="submit"] {
-  display: block;
+  display: inline-block;
   margin-top: 10px;
   color: black;
   background-color: lightgray;
@@ -122,4 +122,12 @@ input[type="submit"] {
 select[name="file_extension"] {
   padding-right: 8px;
   height: 21px;
+}
+
+.cancel-button {
+  display: inline-block;
+  margin-top: 10px;
+  color: black;
+  background-color: lightgray;
+  cursor: pointer;
 }

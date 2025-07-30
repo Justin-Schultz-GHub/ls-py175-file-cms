@@ -4,6 +4,9 @@
     <h2>Edit contents of {{ file | capitalize }}:</h2>
     <form method='POST' action="{{ url_for('save_file', filename=file) }}">
         <textarea name='edit_file'>{{ content }}</textarea>
-        <input type="submit" value="Save"/>
+        <div>
+            <input type="submit" value="Save"/>
+            <button type="button" class="cancel-button" onclick="window.location='{{ url_for('index') }}'">Cancel</button>
+        </div>
     </form>
 {% endblock %}
