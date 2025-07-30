@@ -3,6 +3,23 @@ body {
   font-family: sans-serif;
 }
 
+.button {
+  -webkit-appearance: button;
+  -moz-appearance: button;
+  border: 2px outset ButtonBorder;
+  padding: 2px 6px;
+  font: menu;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  display: block;
+  margin-top: 10px;
+  color: black;
+  background-color: lightgray;
+  float: right;
+}
+
 header {
   font-size: 50px;
 }
@@ -74,7 +91,8 @@ header {
   vertical-align: middle;
 }
 
-textarea[name="edit_file"] {
+textarea[name="edit_file"],
+textarea[name="file_content"] {
   height: 300px;
   font-family: monospace;
   font-size: 16px;
@@ -87,7 +105,8 @@ textarea[name="edit_file"] {
 }
 
 @media (min-width: 768px) {
-  textarea[name="edit_file"] {
+  textarea[name="edit_file"],
+  textarea[name="file_content"] {
     width: 50%;
   }
 }
@@ -97,4 +116,10 @@ input[type="submit"] {
   margin-top: 10px;
   color: black;
   background-color: lightgray;
+  cursor: pointer;
+}
+
+select[name="file_extension"] {
+  padding-right: 8px;
+  height: 21px;
 }

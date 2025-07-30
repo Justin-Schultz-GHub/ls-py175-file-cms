@@ -1,5 +1,6 @@
 from markdown import markdown
 import os
+import string
 from flask import (
                     flash,
                     Flask,
@@ -23,6 +24,13 @@ def get_file_path(data_dir, filename):
 
 def is_valid_path(file_path):
     return os.path.isfile(file_path)
+
+def is_valid_file_name(name):
+    valid_chars = list(string.ascii_letters) + ['-', '_']
+    return bool(name) and all(char in valid_chars for char in name)
+
+def file_exists(path):
+    return os.path.exists(path)
 
 # Route hooks
 @app.route('/')
@@ -76,6 +84,37 @@ def save_file(filename):
         return redirect(url_for('index'))
 
     flash(f'"{filename}" does not exist.', 'error')
+    return redirect(url_for('index'))
+
+@app.route('/files/new')
+def new_file():
+    return render_template('create_file.html')
+
+@app.route('/files/new/save', methods=['POST'])
+def create_file():
+    data_dir = get_data_dir()
+    filename = request.form['file_name']
+    if not filename:
+        flash('File name cannot be empty.', 'error')
+        return redirect(url_for('new_file'))
+
+    elif not is_valid_file_name(filename):
+        flash(f'File name can only contain letters (A-Z, a-z), hyphens (-), and underscores (_).', 'error')
+        return redirect(url_for('new_file'))
+
+    extension = request.form['file_extension']
+    filename += extension
+
+    if file_exists(get_file_path(data_dir, filename)):
+        flash('A file with this name already exists.', 'error')
+        return redirect(url_for('new_file'))
+
+    content = request.form['file_content']
+
+    with open(os.path.join(data_dir, filename), 'w') as file:
+        file.write(content)
+
+    flash(f'Successfully created {filename}.', 'success')
     return redirect(url_for('index'))
 
 if __name__ == "__main__":

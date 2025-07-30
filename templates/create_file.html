@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>Create a New File:</h1>
+    <form method='POST' action="{{ url_for('create_file') }}">
+        <h3>New Document Name:</h3>
+        <input type="text" name="file_name"/>
+        <select name="file_extension">
+            <option value=".txt">.txt</option>
+            <option value=".md">.md</option>
+        </select>
+        <h3>New Document Content:</h3>
+        <textarea name="file_content"></textarea>
+        <input type="submit" value="Submit"/>
+    </form>
+{% endblock %}
