@@ -96,18 +96,33 @@ def create_file():
     filename = request.form['file_name']
     if not filename:
         flash('File name cannot be empty.', 'error')
-        return redirect(url_for('new_file'))
+        return render_template('create_file.html',
+                               file_content=request.form['file_content'],
+                               file_name=request.form['file_name'],
+                               file_extension=request.form['file_extension']
+                       ), 422
 
     elif not is_valid_file_name(filename):
-        flash(f'File name can only contain letters (A-Z, a-z), hyphens (-), and underscores (_).', 'error')
-        return redirect(url_for('new_file'))
+        flash(
+                f'File name can only contain letters (A-Z, a-z), '
+                f'hyphens (-), and underscores (_).', 'error'
+            )
+        return render_template('create_file.html',
+                               file_content=request.form['file_content'],
+                               file_name=request.form['file_name'],
+                               file_extension=request.form['file_extension']
+                       ), 422
 
     extension = request.form['file_extension']
     filename += extension
 
     if file_exists(get_file_path(data_dir, filename)):
         flash('A file with this name already exists.', 'error')
-        return redirect(url_for('new_file'))
+        return render_template('create_file.html',
+                               file_content=request.form['file_content'],
+                               file_name=request.form['file_name'],
+                               file_extension=request.form['file_extension']
+                       ), 422
 
     content = request.form['file_content']
 

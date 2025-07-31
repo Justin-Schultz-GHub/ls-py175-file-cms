@@ -6,9 +6,9 @@
         {% for file in files %}
         <li>
             <a href="{{ url_for('display_file', filename=file) }}">{{ file | capitalize }}</a>
-            <a class="edit" href="{{ url_for('edit_file', filename=file) }}">Edit Document</a>
+            <a class="edit" href="{{ url_for('edit_file', filename=file) }}">Edit File</a>
         </li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('new_file') }}" class="button">New Document</a>
+    <a href="{{ url_for('new_file') }}" class="button">New File</a>
 {% endblock %}

@@ -95,5 +95,38 @@ class AppTest(unittest.TestCase):
             with open(file_path, 'w') as file:
                 file.write(original_content)
 
+    def test_display_new_file_page(self):
+        response = self.client.get('/files/new')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('<h1>Create a New File', response.get_data(as_text=True))
+        self.assertIn('<textarea name="file_content">', response.get_data(as_text=True))
+
+    def test_create_file(self):
+        response = self.client.post('/files/new/save',
+                                    data={
+                                        'file_name': 'Test_File',
+                                        'file_extension': '.md',
+                                        'file_content': 'This is a test',
+                                    },
+                                    follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Successfully created Test_File.md',
+                        response.get_data(as_text=True)
+                        )
+        response = self.client.get('/files')
+        self.assertIn('Test_File.md', response.get_data(as_text=True))
+
+    def test_create_nameless_file(self):
+        response = self.client.post('/files/new/save',
+                                    data={
+                                        'file_name': '',
+                                        'file_extension': '.md',
+                                        'file_content': 'This is a test',
+                                    })
+        self.assertEqual(response.status_code, 422)
+        self.assertIn('File name cannot be empty.', response.get_data(as_text=True))
+        self.assertIn('This is a test', response.get_data(as_text=True))
+        self.assertIn('<option value=".md" selected>', response.get_data(as_text=True))
+
     def tearDown(self):
         shutil.rmtree(self.data_path, ignore_errors=True)

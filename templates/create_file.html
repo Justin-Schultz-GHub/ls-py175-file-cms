@@ -3,14 +3,14 @@
 {% block content %}
     <h1>Create a New File:</h1>
     <form method='POST' action="{{ url_for('create_file') }}">
-        <h3>New Document Name:</h3>
-        <input type="text" name="file_name"/>
+        <h3>New File Name:</h3>
+        <input type="text" name="file_name" value="{{ file_name or '' }}"/>
         <select name="file_extension">
-            <option value=".txt">.txt</option>
-            <option value=".md">.md</option>
+            <option value=".txt" {% if file_extension == '.txt' %}selected{% endif %}>.txt</option>
+            <option value=".md" {% if file_extension == '.md' %}selected{% endif %}>.md</option>
         </select>
-        <h3>New Document Content:</h3>
-        <textarea name="file_content"></textarea>
+        <h3>New File Content:</h3>
+        <textarea name="file_content">{{ file_content or '' }}</textarea>
         <div>
             <input type="submit" value="Submit"/>
             <button type="button" class="cancel-button" onclick="window.location='{{ url_for('index') }}'">Cancel</button>
