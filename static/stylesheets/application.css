@@ -63,6 +63,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-left: 24px;
 }
 
 #files li a {
@@ -76,6 +77,13 @@ header {
   max-width: 100%;
 }
 
+#files li > a:first-child {
+  flex-grow: 1;
+  overflow-x: auto;
+  background-color: #c0c0c0;
+  border-radius: 0.25em;
+}
+
 #file-list-title {
   font-size: 50px;
 }
@@ -87,6 +95,17 @@ header {
   height: 16px;
   margin-right: 6px;
   background: url('/static/images/icon_edit.png') no-repeat center center;
+  background-size: contain;
+  vertical-align: middle;
+}
+
+.delete::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  background: url('/static/images/icon_delete.png') no-repeat center center;
   background-size: contain;
   vertical-align: middle;
 }
