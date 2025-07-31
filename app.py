@@ -8,6 +8,7 @@ from flask import (
                     redirect,
                     request,
                     send_from_directory,
+                    session,
                     url_for,
                     )
 
@@ -35,7 +36,20 @@ def file_exists(path):
 # Route hooks
 @app.route('/')
 def index():
-    return redirect(url_for('get_files'))
+    return render_template('index.html')
+
+@app.route('/sign_in', methods=['GET', 'POST'])
+def sign_in():
+    if request.method == 'GET':
+        return render_template('sign_in.html')
+    elif request.method == 'POST':
+        username, password = request.form['username'], request.form['password']
+        if username == 'admin' and password == 'secret':
+            flash('Welcome!', 'success')
+            return redirect(url_for('get_files'))
+
+    flash('Invalid login credentials', 'error')
+    return render_template('sign_in.html')
 
 @app.route('/files')
 def get_files():
