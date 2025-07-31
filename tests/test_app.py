@@ -128,5 +128,12 @@ class AppTest(unittest.TestCase):
         self.assertIn('This is a test', response.get_data(as_text=True))
         self.assertIn('<option value=".md" selected>', response.get_data(as_text=True))
 
+    def test_delete_file(self):
+        test_files = ['changes.txt','about.md', 'history.txt']
+        for file in test_files:
+            response = self.client.post(f'/files/{file}/delete')
+            self.assertNotIn(file, response.get_data(as_text=True))
+            self.assertEqual(response.status_code, 302)
+
     def tearDown(self):
         shutil.rmtree(self.data_path, ignore_errors=True)
