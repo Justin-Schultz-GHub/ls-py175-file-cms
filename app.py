@@ -132,7 +132,7 @@ def create_file():
     flash(f'Successfully created {filename}.', 'success')
     return redirect(url_for('index'))
 
-@app.route('/files/<filename>/delete')
+@app.route('/files/<filename>/delete', methods=['POST'])
 def delete_file(filename):
     data_dir = get_data_dir()
     file_path = get_file_path(data_dir, filename)

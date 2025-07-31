@@ -99,7 +99,7 @@ header {
   vertical-align: middle;
 }
 
-.delete::before {
+#files li form.delete button.delete::before {
   content: '';
   display: inline-block;
   width: 16px;
@@ -149,4 +149,20 @@ select[name="file_extension"] {
   color: black;
   background-color: lightgray;
   cursor: pointer;
+}
+
+#files li a.edit,
+#files li form.delete button.delete {
+  color: #000;
+  background: none;
+  border: none;
+  padding: 18px clamp(10px, 5vw, 25px) 18px clamp(2px, 5vw, 57px);
+  font-size: clamp(6px, 4vw, 40px);
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  vertical-align: middle;
 }
