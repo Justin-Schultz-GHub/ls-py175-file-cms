@@ -215,3 +215,37 @@ select[name="file_extension"] {
   background-color: lightgray;
   float: left;
 }
+
+.sign-out-button {
+  -webkit-appearance: button;
+  -moz-appearance: button;
+  border: 2px outset ButtonBorder;
+  padding: 2px 6px;
+  font: menu;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  color: black;
+  background-color: lightgray;
+  display: inline-block;
+  line-height: normal;
+  margin: 0;
+}
+
+.sign-out-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.sign-out-container p {
+  margin: 0;
+}
+
+.sign-out-button {
+  display: inline-block;
+  margin-top: 0;
+}

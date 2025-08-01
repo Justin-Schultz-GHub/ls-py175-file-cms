@@ -45,11 +45,18 @@ def sign_in():
     elif request.method == 'POST':
         username, password = request.form['username'], request.form['password']
         if username == 'admin' and password == 'secret':
+            session['username'] = username
             flash('Welcome!', 'success')
             return redirect(url_for('get_files'))
 
     flash('Invalid login credentials', 'error')
     return render_template('sign_in.html')
+
+@app.route('/sign_out', methods=['POST'])
+def sign_out():
+    session.pop('username', None)
+    flash('You have been signed out.', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/files')
 def get_files():

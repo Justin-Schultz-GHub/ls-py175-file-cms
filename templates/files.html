@@ -16,4 +16,10 @@
         {% endfor %}
     </ul>
     <a href="{{ url_for('new_file') }}" class="button">New File</a>
+    {% if session.get('username') %}
+        <form action="{{ url_for('sign_out') }}" method="POST" class="sign-out-container">
+            <p>Signed in as {{ session.get('username') }}</p>
+            <button type="submit" class="sign-out-button">Sign Out</button>
+        </form>
+    {% endif %}
 {% endblock %}
