@@ -26,7 +26,7 @@ class AppTest(unittest.TestCase):
 
     def test_index(self):
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
     def test_get_files(self):
         response = self.client.get('/files')
@@ -134,6 +134,57 @@ class AppTest(unittest.TestCase):
             response = self.client.post(f'/files/{file}/delete')
             self.assertNotIn(file, response.get_data(as_text=True))
             self.assertEqual(response.status_code, 302)
+
+    def test_display_sign_in_page(self):
+        response = self.client.get('/sign_in')
+        self.assertEqual(response.status_code, 200)
+
+    def test_successful_sign_in(self):
+        with self.client:
+            self.client.post('/sign_in',
+                                    data={
+                                        'username': 'admin',
+                                        'password': 'secret',
+                                    })
+            with self.client.session_transaction() as session:
+                self.assertEqual(session.get('username'), 'admin')
+
+            response = self.client.post('/sign_in',
+                                    data={
+                                        'username': 'admin',
+                                        'password': 'secret',
+                                    })
+            self.assertEqual(response.status_code, 302)
+            response = self.client.post('/sign_in',
+                                    data={
+                                        'username': 'admin',
+                                        'password': 'secret',
+                                    },
+                                    follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Welcome!', response.get_data(as_text=True))
+            self.assertIn('File List:', response.get_data(as_text=True))
+
+    def test_unsuccessful_sign_in(self):
+        response = self.client.post('/sign_in',
+                                    data={
+                                        'username': 'username',
+                                        'password': 'secret',
+                                    },)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Invalid login credentials', response.get_data(as_text=True))
+
+    def test_sign_out(self):
+        with self.client:
+            self.client.post('/sign_out')
+            with self.client.session_transaction() as session:
+                self.assertNotIn('username', session)
+
+            response = self.client.post('/sign_out')
+            self.assertEqual(response.status_code, 302)
+            response = self.client.post('/sign_out', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('You have been signed out.', response.get_data(as_text=True))
 
     def tearDown(self):
         shutil.rmtree(self.data_path, ignore_errors=True)
