@@ -1,3 +1,4 @@
+import bcrypt
 from functools import wraps
 from markdown import markdown
 import os
@@ -12,11 +13,32 @@ from flask import (
                     session,
                     url_for,
                     )
+import yaml
 
 app = Flask(__name__)
 app.secret_key='secret1'
 
 # Helper functions
+def load_user_credentials():
+    filename = 'users.yml'
+    root_dir = os.path.dirname(__file__)
+    if app.config['TESTING']:
+        credentials_path = os.path.join(root_dir, 'tests', filename)
+    else:
+        credentials_path = os.path.join(root_dir, 'cms', filename)
+
+    with open(credentials_path, 'r') as file:
+        return yaml.safe_load(file)
+
+def valid_credentials(username, password):
+    credentials = load_user_credentials()
+
+    if username in credentials:
+        stored_password = credentials[username].encode('utf-8')
+        return bcrypt.checkpw(password.encode('utf-8'), stored_password)
+    else:
+        return False
+
 def get_data_dir():
     subdir = 'tests/data' if app.config['TESTING'] else 'cms/data'
     return os.path.join(os.path.dirname(__file__), subdir)
@@ -59,13 +81,15 @@ def sign_in():
         return render_template('sign_in.html')
     elif request.method == 'POST':
         username, password = request.form['username'], request.form['password']
-        if username == 'admin' and password == 'secret':
+        credentials = load_user_credentials()
+
+        if valid_credentials(username, password):
             session['username'] = username
             flash('Welcome!', 'success')
             return redirect(url_for('get_files'))
-
-    flash('Invalid login credentials', 'error')
-    return render_template('sign_in.html')
+        else:
+            flash('Invalid login credentials', 'error')
+            return render_template('sign_in.html')
 
 @app.route('/sign_out', methods=['POST'])
 def sign_out():

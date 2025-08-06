@@ -11,6 +11,8 @@ flask = "^3.0.0"
 gunicorn = "^21.2.0"
 uuid = "^1.30"
 markdown = "^3.8.2"
+pyyaml = "^6.0.2"
+bcrypt = "^4.3.0"
 
 [build-system]
 requires = ["poetry-core"]
