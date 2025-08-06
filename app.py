@@ -57,7 +57,7 @@ def file_exists(path):
     return os.path.exists(path)
 
 def user_signed_in():
-    return session.get('username') == 'admin'
+    return session.get('username') in load_user_credentials()
 
 def require_signed_in_user(func):
     @wraps(func)
