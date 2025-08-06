@@ -81,7 +81,6 @@ def sign_in():
         return render_template('sign_in.html')
     elif request.method == 'POST':
         username, password = request.form['username'], request.form['password']
-        credentials = load_user_credentials()
 
         if valid_credentials(username, password):
             session['username'] = username
