@@ -13,7 +13,7 @@
         <textarea name="file_content">{{ file_content or '' }}</textarea>
         <div>
             <input type="submit" value="Submit"/>
-            <button type="button" class="cancel-button" onclick="window.location='{{ url_for('index') }}'">Cancel</button>
+            <button type="button" class="cancel-button" onclick="window.location='{{ url_for('get_files') }}'">Cancel</button>
         </div>
     </form>
 {% endblock %}

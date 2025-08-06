@@ -94,7 +94,7 @@ def display_file(filename):
             return send_from_directory(data_dir, filename)
 
     flash(f'"{filename}" does not exist.', 'error')
-    return redirect(url_for('index'))
+    return redirect(url_for('get_files'))
 
 @app.route('/files/<filename>/edit')
 @require_signed_in_user
@@ -119,10 +119,10 @@ def save_file(filename):
             file.write(new_content)
 
         flash(f'Successfully edited {filename}.', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('get_files'))
 
     flash(f'"{filename}" does not exist.', 'error')
-    return redirect(url_for('index'))
+    return redirect(url_for('get_files'))
 
 @app.route('/files/new')
 @require_signed_in_user
@@ -170,7 +170,7 @@ def create_file():
         file.write(content)
 
     flash(f'Successfully created {filename}.', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('get_files'))
 
 @app.route('/files/<filename>/delete', methods=['POST'])
 @require_signed_in_user
@@ -182,10 +182,10 @@ def delete_file(filename):
         os.remove(file_path)
 
         flash(f'Successfully deleted {filename}.', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('get_files'))
 
     flash(f'The file you are trying to delete does not exist: ({filename})', 'error')
-    return redirect(url_for('index'))
+    return redirect(url_for('get_files'))
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

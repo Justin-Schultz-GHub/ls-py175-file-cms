@@ -6,7 +6,7 @@
         <textarea name='edit_file'>{{ content }}</textarea>
         <div>
             <input type="submit" value="Save"/>
-            <button type="button" class="cancel-button" onclick="window.location='{{ url_for('index') }}'">Cancel</button>
+            <button type="button" class="cancel-button" onclick="window.location='{{ url_for('get_files') }}'">Cancel</button>
         </div>
     </form>
 {% endblock %}
