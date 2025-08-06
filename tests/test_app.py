@@ -20,9 +20,16 @@ class AppTest(unittest.TestCase):
         for key, value in test_cases.items():
             self.create_document(key, value)
 
-    def create_document(self, name, content=""):
+    def create_document(self, name, content=''):
         with open(os.path.join(self.data_path, name), 'w') as file:
             file.write(content)
+
+    def admin_session(self):
+        with self.client:
+            with self.client.session_transaction() as session:
+                session['username'] = 'admin'
+
+            return self.client
 
     def test_index(self):
         response = self.client.get('/')
@@ -68,12 +75,43 @@ class AppTest(unittest.TestCase):
             self.assertIn(f'<h1>About This Project</h1>', response_text)
 
     def test_edit_file_page(self):
-        response = self.client.get('/files/changes.txt/edit')
+        with self.admin_session() as client:
+            response = client.get('/files/changes.txt/edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<textarea', response.get_data(as_text=True))
+            self.assertIn('<input type="submit" value="Save"/>', response.get_data(as_text=True))
+
+    def test_guest_edit_file_page(self):
+        response = self.client.get('/files/changes.txt/edit', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("<textarea", response.get_data(as_text=True))
-        self.assertIn('<input type="submit" value="Save"/>', response.get_data(as_text=True))
+        self.assertIn(r'class="sign-in-button">Sign In</a>', response.get_data(as_text=True))
+        self.assertIn('You must be signed in to do that.', response.get_data(as_text=True))
 
     def test_save_file(self):
+        test_files = ['changes.txt','about.md', 'history.txt']
+        data_dir = get_data_dir()
+
+        for filename in test_files:
+            file_path = get_file_path(data_dir, filename)
+            with open(file_path, 'r') as file:
+                original_content = file.read()
+
+            new_content = 'This is a test.'
+            try:
+                with self.admin_session() as client:
+                    response = client.post(
+                                f'/files/{filename}',
+                                data={'edit_file': new_content},
+                                content_type='application/x-www-form-urlencoded'
+                            )
+                    self.assertEqual(response.status_code, 302)
+                    with open(file_path, 'r') as file:
+                        self.assertEqual(new_content, file.read())
+            finally:
+                with open(file_path, 'w') as file:
+                    file.write(original_content)
+
+    def test_guest_save_file(self):
         test_files = ['changes.txt','about.md', 'history.txt']
         data_dir = get_data_dir()
 
@@ -86,22 +124,43 @@ class AppTest(unittest.TestCase):
             response = self.client.post(
                         f'/files/{filename}',
                         data={'edit_file': new_content},
-                        content_type='application/x-www-form-urlencoded'
+                        content_type='application/x-www-form-urlencoded',
+                        follow_redirects=True
                     )
-            self.assertEqual(response.status_code, 302)
-            with open(file_path, 'r') as file:
-                self.assertEqual(new_content, file.read())
-
-            with open(file_path, 'w') as file:
-                file.write(original_content)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(r'class="sign-in-button">Sign In</a>', response.get_data(as_text=True))
+            self.assertIn('You must be signed in to do that.', response.get_data(as_text=True))
 
     def test_display_new_file_page(self):
-        response = self.client.get('/files/new')
+        with self.admin_session() as client:
+            response = client.get('/files/new')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<h1>Create a New File', response.get_data(as_text=True))
+            self.assertIn('<textarea name="file_content">', response.get_data(as_text=True))
+
+    def test_guest_display_new_file_page(self):
+        response = self.client.get('/files/new', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('<h1>Create a New File', response.get_data(as_text=True))
-        self.assertIn('<textarea name="file_content">', response.get_data(as_text=True))
+        self.assertIn(r'class="sign-in-button">Sign In</a>', response.get_data(as_text=True))
+        self.assertIn('You must be signed in to do that.', response.get_data(as_text=True))
 
     def test_create_file(self):
+        with self.admin_session() as client:
+            response = client.post('/files/new/save',
+                                        data={
+                                            'file_name': 'Test_File',
+                                            'file_extension': '.md',
+                                            'file_content': 'This is a test',
+                                        },
+                                        follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Successfully created Test_File.md',
+                            response.get_data(as_text=True)
+                            )
+            response = client.get('/files')
+            self.assertIn('Test_File.md', response.get_data(as_text=True))
+
+    def test_guest_create_file(self):
         response = self.client.post('/files/new/save',
                                     data={
                                         'file_name': 'Test_File',
@@ -110,30 +169,36 @@ class AppTest(unittest.TestCase):
                                     },
                                     follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Successfully created Test_File.md',
-                        response.get_data(as_text=True)
-                        )
-        response = self.client.get('/files')
-        self.assertIn('Test_File.md', response.get_data(as_text=True))
+        self.assertIn(r'class="sign-in-button">Sign In</a>', response.get_data(as_text=True))
+        self.assertIn('You must be signed in to do that.', response.get_data(as_text=True))
 
     def test_create_nameless_file(self):
-        response = self.client.post('/files/new/save',
-                                    data={
-                                        'file_name': '',
-                                        'file_extension': '.md',
-                                        'file_content': 'This is a test',
-                                    })
-        self.assertEqual(response.status_code, 422)
-        self.assertIn('File name cannot be empty.', response.get_data(as_text=True))
-        self.assertIn('This is a test', response.get_data(as_text=True))
-        self.assertIn('<option value=".md" selected>', response.get_data(as_text=True))
+        with self.admin_session() as client:
+            response = client.post('/files/new/save',
+                                        data={
+                                            'file_name': '',
+                                            'file_extension': '.md',
+                                            'file_content': 'This is a test',
+                                        })
+            self.assertEqual(response.status_code, 422)
+            self.assertIn('File name cannot be empty.', response.get_data(as_text=True))
+            self.assertIn('This is a test', response.get_data(as_text=True))
+            self.assertIn('<option value=".md" selected>', response.get_data(as_text=True))
 
     def test_delete_file(self):
         test_files = ['changes.txt','about.md', 'history.txt']
         for file in test_files:
-            response = self.client.post(f'/files/{file}/delete')
-            self.assertNotIn(file, response.get_data(as_text=True))
-            self.assertEqual(response.status_code, 302)
+            with self.admin_session() as client:
+                response = client.post(f'/files/{file}/delete', follow_redirects=True)
+                self.assertEqual(response.status_code, 200)
+                self.assertNotIn(f'<a href="/files/{file}">{file}</a>', response.get_data(as_text=True))
+
+    def test_guest_delete_file(self):
+        test_files = ['changes.txt','about.md', 'history.txt']
+        for file in test_files:
+            response = self.client.post(f'/files/{file}/delete', follow_redirects=True)
+            self.assertIn(r'class="sign-in-button">Sign In</a>', response.get_data(as_text=True))
+            self.assertIn('You must be signed in to do that.', response.get_data(as_text=True))
 
     def test_display_sign_in_page(self):
         response = self.client.get('/sign_in')

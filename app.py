@@ -1,3 +1,4 @@
+from functools import wraps
 from markdown import markdown
 import os
 import string
@@ -32,6 +33,20 @@ def is_valid_file_name(name):
 
 def file_exists(path):
     return os.path.exists(path)
+
+def user_signed_in():
+    return session.get('username') == 'admin'
+
+def require_signed_in_user(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if not user_signed_in():
+            flash('You must be signed in to do that.', 'error')
+            return redirect(url_for('index'))
+
+        return func(*args, **kwargs)
+
+    return decorated_function
 
 # Route hooks
 @app.route('/')
@@ -82,6 +97,7 @@ def display_file(filename):
     return redirect(url_for('index'))
 
 @app.route('/files/<filename>/edit')
+@require_signed_in_user
 def edit_file(filename):
     data_dir = get_data_dir()
     file_path = get_file_path(data_dir, filename)
@@ -92,6 +108,7 @@ def edit_file(filename):
     return render_template('edit_file.html', file=filename, content=content)
 
 @app.route('/files/<filename>', methods=['POST'])
+@require_signed_in_user
 def save_file(filename):
     data_dir = get_data_dir()
     file_path = get_file_path(data_dir, filename)
@@ -108,10 +125,12 @@ def save_file(filename):
     return redirect(url_for('index'))
 
 @app.route('/files/new')
+@require_signed_in_user
 def new_file():
     return render_template('create_file.html')
 
 @app.route('/files/new/save', methods=['POST'])
+@require_signed_in_user
 def create_file():
     data_dir = get_data_dir()
     filename = request.form['file_name']
@@ -154,6 +173,7 @@ def create_file():
     return redirect(url_for('index'))
 
 @app.route('/files/<filename>/delete', methods=['POST'])
+@require_signed_in_user
 def delete_file(filename):
     data_dir = get_data_dir()
     file_path = get_file_path(data_dir, filename)
